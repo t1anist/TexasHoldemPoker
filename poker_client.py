@@ -6,21 +6,34 @@ import sys
 import time
 clock_s = 0
 clock_flag = 0
+#牌组 （value,color)
 deck = [(2, 1), (2, 2), (2, 3), (2, 4), (3, 1), (3, 2), (3, 3), (3, 4), (4, 1), (4, 2), (4, 3), (4, 4), (5, 1), (5, 2),
-        (5, 3), (5, 4),
-        (6, 1), (6, 2), (6, 3), (6, 4), (7, 1), (7, 2), (7, 3), (7, 4), (8, 1), (8, 2), (8, 3), (8, 4), (9, 1), (9, 2),
-        (9, 3), (9, 4),
-        (10, 1), (10, 2), (10, 3), (10, 4), (11, 1), (11, 2), (11, 3), (11, 4), (12, 1), (12, 2), (12, 3), (12, 4),
-        (13, 1), (13, 2), (13, 3), (13, 4), (14, 1), (14, 2), (14, 3), (14, 4)]
+        (5, 3), (5, 4), (6, 1), (6, 2), (6, 3), (6, 4), (7, 1), (7, 2), (7, 3), (7, 4), (8, 1), (8, 2), (8, 3), (8, 4),
+        (9, 1), (9, 2), (9, 3), (9, 4), (10, 1), (10, 2), (10, 3), (10, 4), (11, 1), (11, 2), (11, 3), (11, 4), (12, 1),
+        (12, 2), (12, 3), (12, 4), (13, 1), (13, 2), (13, 3), (13, 4), (14, 1), (14, 2), (14, 3), (14, 4)]
 flag = 0
 
 def get_card_power(num1, num2, num3, num4, num5, color1, color2, color3, color4, color5):  # 获得牌力一般方法
+    '''
+    Determine the type of five cards
+    :param num1: value of card 1
+    :param num2: value of card 2
+    :param num3: value of card 3
+    :param num4: value of card 4
+    :param num5: value of card 5
+    :param color1: color of card 1
+    :param color2: color of card 1
+    :param color3: color of card 1
+    :param color4: color of card 1
+    :param color5: color of card 1
+    :return: cards value of five cards
+    '''
     cards_list = [num1, num2, num3, num4, num5]  # 牌值 2-A 映射到 2 -14
     suites_list = [color1, color2, color3, color4, color5]  # 花色 映射到 1，2，3，4
     cards_list.sort()
     result = 0
     straight = 1
-    for i in range(4):
+    for i in range(4):   #  顺子
         if cards_list[i] + 1 != cards_list[i + 1]:
             straight = 0
             break
@@ -31,16 +44,20 @@ def get_card_power(num1, num2, num3, num4, num5, color1, color2, color3, color4,
         else:  # 同花
             for i in range(5):
                 result = result | cards_list[i] << 4 * i
+                print(result)
             result = 6 << 20 | result
     elif cards_list.count(cards_list[2]) == 4:  # 四条
         result = cards_list[1]
         result = 8 << 20 | result
     elif (cards_list.count(cards_list[0]) == 3 and cards_list.count(cards_list[4]) == 2) or \
-            (cards_list.count(cards_list[0]) == 2 and cards_list.count(cards_list[4]) == 3):
+            (cards_list.count(cards_list[0]) == 2 and cards_list.count(cards_list[4]) == 3):     # 葫芦
         result = cards_list[2]
         result = 7 << 20 | result
     elif cards_list == [2, 3, 4, 5, 14] or straight == 1:  # 顺子
-        result = cards_list[0]
+        if cards_list[4] == 14:
+            result = 1
+        else:
+            result = cards_list[0]
         result = 5 << 20 | result
     elif cards_list.count(cards_list[2]) == 3:  # 三条
         result = cards_list[2]
@@ -90,8 +107,13 @@ def get_card_power(num1, num2, num3, num4, num5, color1, color2, color3, color4,
             result = 1 << 20 | result
     return result
 
-
 def rank(hand_card, public_card):
+    '''
+    Return the maximum value of two hand cards and five public cards
+    :param hand_card: two hand cards (value and color)
+    :param public_card: five public cards (value and color)
+    :return: maximum value of cards
+    '''
     max = 0
     poker_card = [hand_card[0], hand_card[1], public_card[0], public_card[1], public_card[2], public_card[3],
                   public_card[4]]
