@@ -3,6 +3,8 @@ import threading
 import re
 import random
 import time
+from hole_cards_level import *
+from action import abs_act
 clock_s = 0
 clock_flag = 0
 #牌组 （value,color)
@@ -163,6 +165,7 @@ def get_p_win(hand1, hand2, public_card1=0, public_card2=0, public_card3=0, publ
     msgs.add(msg_p_win)
     return Player.p_win
 
+# TODO : finish Action_AI
 def action_AI(p_win):
     time.sleep(2)
     hand_card = player[0].hand_card
@@ -289,18 +292,24 @@ def recv_msg(tcp_socket):
                     update_cards(player, num1, num2, num3)
                     if Player.ID == num1 and len(ret) == 1 and flag == 2:
                         Player.hand_card = [f_t(num2), f_t(num3)]
-                        get_p_win(Player.hand_card[0],Player.hand_card[1])
+                        Player.hole_card_level = get_hole_card_level(Player.hand_card[0], Player.hand_card[1])
+                        get_p_win(Player.hand_card[0], Player.hand_card[1])
             ret = re.match(r".*玩家([1-8])下小盲注：([0-9]{1,4})，玩家([1-8])下大盲注：([0-9]{1,4})", data)
             if ret:
                 update_msg_action(int(ret[1]), "小盲注" + str(ret[2]))
                 update_msg_action(int(ret[3]), "大盲注" + str(ret[4]))
                 update_msg_money(int(ret[1]), int(ret[2]))
                 update_msg_money(int(ret[3]), int(ret[4]))
+                if int(ret[1]) != Player.ID:
+                    Opponet.bet_money += int(ret[2])
+                elif int(ret[2]) != Player.ID:
+                    Opponet.bet_money += int(ret[4])
                 player[int(ret[1])].bet_money = int(ret[2])
                 player[int(ret[3])].bet_money = int(ret[4])
                 Player.raise_money = Player.call_money = int(ret[4])
                 msg_bet_money.update_msg(Player.call_money)
                 msgs.add(msg_bet_money)
+            # TODO : import board texture
             ret = re.match(r".*前三张公共牌为：([0-9]{1,2})[，]([0-9]{1,2})[，]([0-9]{1,2})", data)
             if ret:
                 for i in range(1, 9):
@@ -332,11 +341,16 @@ def recv_msg(tcp_socket):
             ret = re.match(r".*玩家([1-8])的动作为：(弃牌)", data)
             if ret:
                 update_msg_action(int(ret.group(1)), ret.group(2))
+                if ret[1] != Player.ID:
+                    Opponet.bet_seq += abs_act.FOLD
             ret = re.match(r".*玩家([1-8])的动作为：(跟注|加注)，([0-9]*)", data)
             if ret:
                 update_msg_action(int(ret.group(1)), ret.group(2) + ret.group(3))
                 update_msg_money(int(ret.group(1)), int(ret.group(3)) - player[int(ret.group(1))].bet_money)
                 player[int(ret.group(1))].bet_money = int(ret.group(3))
+                if ret[1] != Player.ID:
+                    Opponet.bet_seq += abs_act.FOLD
+                    Opponet.bet_money = int(ret.group(3))
             ret = re.match(r".*玩家([1-8])行动中，([0-9]*)", data)
             if ret:
                 update_msg_action(int(ret.group(1)), " ")

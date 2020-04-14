@@ -62,8 +62,8 @@ level = {1: [r"14,[1-4],14,[1-4]"],
          45: [r"2,[1-4],14,[1-4]", r"3,([1-4]),8,\1", r"4,([1-4]),9,\1", r"2,([1-4]),7,\1", r"2,([1-4]),3,\1"]
          }
 
-def hole_card_level(hand_cards):
-    string = "%d,%d,%d,%d" % (hand_cards[0][0], hand_cards[0][1], hand_cards[1][0], hand_cards[1][1])
+def get_hole_card_level(hand_card0, hand_card1):
+    string = "%d,%d,%d,%d" % (hand_card0[0], hand_card0[1], hand_card1[0], hand_card1[1])
     for x in level.keys():
         for y in level[x]:
             if re.findall(y, string):

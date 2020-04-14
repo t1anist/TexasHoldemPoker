@@ -40,8 +40,9 @@ class Player():
     call_money = 2  # 跟注额
     state = 1  # 游戏状态
     pot_money = 0  # 池内筹码
-    p_win = 0  #  牌力值
-    hand_card = [7,8]
+    p_win = 0  # 牌力值
+    hole_card_level = 0
+    hand_card = [7, 8]
     public_card = [2, 3, 4, 5, 6]
     def __init__(self,num=2):
         self.name = 'xx'
