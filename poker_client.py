@@ -2,7 +2,6 @@ import socket
 import threading
 import re
 import random
-import sys
 import time
 clock_s = 0
 clock_flag = 0
@@ -14,7 +13,7 @@ deck = [(2, 1), (2, 2), (2, 3), (2, 4), (3, 1), (3, 2), (3, 3), (3, 4), (4, 1), 
 flag = 0
 
 def get_card_power(num1, num2, num3, num4, num5, color1, color2, color3, color4, color5):  # 获得牌力一般方法
-    '''
+    """
     Determine the type of five cards
     :param num1: value of card 1
     :param num2: value of card 2
@@ -22,12 +21,12 @@ def get_card_power(num1, num2, num3, num4, num5, color1, color2, color3, color4,
     :param num4: value of card 4
     :param num5: value of card 5
     :param color1: color of card 1
-    :param color2: color of card 1
-    :param color3: color of card 1
-    :param color4: color of card 1
-    :param color5: color of card 1
+    :param color2: color of card 2
+    :param color3: color of card 3
+    :param color4: color of card 4
+    :param color5: color of card 5
     :return: cards value of five cards
-    '''
+    """
     cards_list = [num1, num2, num3, num4, num5]  # 牌值 2-A 映射到 2 -14
     suites_list = [color1, color2, color3, color4, color5]  # 花色 映射到 1，2，3，4
     cards_list.sort()
@@ -44,7 +43,6 @@ def get_card_power(num1, num2, num3, num4, num5, color1, color2, color3, color4,
         else:  # 同花
             for i in range(5):
                 result = result | cards_list[i] << 4 * i
-                print(result)
             result = 6 << 20 | result
     elif cards_list.count(cards_list[2]) == 4:  # 四条
         result = cards_list[1]
@@ -108,12 +106,12 @@ def get_card_power(num1, num2, num3, num4, num5, color1, color2, color3, color4,
     return result
 
 def rank(hand_card, public_card):
-    '''
+    """
     Return the maximum value of two hand cards and five public cards
     :param hand_card: two hand cards (value and color)
     :param public_card: five public cards (value and color)
     :return: maximum value of cards
-    '''
+    """
     max = 0
     poker_card = [hand_card[0], hand_card[1], public_card[0], public_card[1], public_card[2], public_card[3],
                   public_card[4]]
@@ -167,8 +165,9 @@ def get_p_win(hand1, hand2, public_card1=0, public_card2=0, public_card3=0, publ
 
 def action_AI(p_win):
     time.sleep(2)
+    hand_card = player[0].hand_card
     if p_win<20:  # 胜率低于20 就直接弃牌
-        tcp_socket.send("弃牌".encode('gbk'))
+        tcp_socket.send("弃牌".encode( 'gbk'))
     elif p_win<40: # 胜率低于40 根据跟注大小进行弃牌或者跟注操作
         if Player.call_money > p_win*p_win/70:
             tcp_socket.send("弃牌".encode('gbk'))
@@ -269,7 +268,7 @@ def recv_msg(tcp_socket):
             pygame.quit()
             return
         if flag == 0:  # 登录注册
-            login(data,tcp_socket)
+            login(data, tcp_socket)
         while flag == 1: # 进入游戏等待
             pass
         if flag >= 2: # 游戏中
@@ -402,7 +401,7 @@ def recv_msg(tcp_socket):
 
 # 1s 的定时中断函数
 def clock_start():
-    global clock_s,clock_flag
+    global clock_s, clock_flag
     if clock_flag == 1:
         clock_flag = 0
         clock_s = 0

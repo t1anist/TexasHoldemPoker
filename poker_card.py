@@ -31,20 +31,25 @@ class Poker_card(Sprite):
 class Player():
     num = 8  # 玩家人数
     ID = 1  # 本服务器游戏ID
-    tempID = 1 # 临时ID
-    time = 60 #
-    raise_money = 2
-    up_money_flag = 0
-    down_money_flag = 0
-    up_down_num = 10
-    call_money = 2
-    state = 1
-    pot_money = 0
-    p_win = 0
+    tempID = 1  # 临时ID
+    time = 60  # 超时时间
+    raise_money = 2  # 加注额
+    up_money_flag = 0  # 增加加注按钮标志位
+    down_money_flag = 0  # 减少加注按钮标志位
+    up_down_num = 10  # 增减注的数量
+    call_money = 2  # 跟注额
+    state = 1  # 游戏状态
+    pot_money = 0  # 池内筹码
+    p_win = 0  #  牌力值
     hand_card = [7,8]
-    public_card = [2,3,4,5,6]
+    public_card = [2, 3, 4, 5, 6]
     def __init__(self,num=2):
         self.name = 'xx'
-        self.money = 1000 #初始化金钱
-        self.addr_list = [6,6,6,6,6]
+        self.money = 1000   # 初始化金钱
+        self.addr_list = [6, 6, 6, 6, 6]
         self.bet_money = 0
+
+#对手类
+class Opponet():
+    bet_seq = ""
+    bet_money = 0
