@@ -20,15 +20,19 @@ img_Dict = {2: img2d, 22: img2c ,42: img2h, 62: img2s,3:img3d, 23:img3c, 43:img3
            6:img6d, 26:img6c, 46:img6h, 66:img6s, 7:img7d, 27:img7c, 47:img7h, 67:img7s, 8:img8d, 28:img8c, 48:img8h, 68:img8s, 9:img9d, 29:img9c, 49:img9h, 69:img9s,
            10:img10d, 30:img10c, 50:img10h, 70:img10s, 11:imgJd, 31:imgJc, 51:imgJh, 71:imgJs, 12:imgQd, 32:imgQc, 52:imgQh, 72:imgQs, 13:imgKd,33:imgKc, 53:imgKh, 73:imgKs,
            14:imgAd, 34:imgAc, 54:imgAh, 74:imgAs }
-#卡片类，在屏幕中显示的位置
+
+
+# 卡片类，在屏幕中显示的位置
 class Poker_card(Sprite):
     def __init__(self):
         super(Poker_card, self).__init__()
-        #初始化卡片并设置其初始位置
+        # 初始化卡片并设置其初始位置
         self.image = pygame.image.load("cardimg/2d.png")
         self.rect = self.image.get_rect()
-#玩家类
-class Player():
+
+
+# 玩家类
+class Player:
     num = 8  # 玩家人数
     ID = 1  # 本服务器游戏ID
     tempID = 1  # 临时ID
@@ -44,13 +48,35 @@ class Player():
     hole_card_level = 0
     hand_card = [7, 8]
     public_card = [2, 3, 4, 5, 6]
-    def __init__(self,num=2):
+
+    def __init__(self, num=2):
         self.name = 'xx'
         self.money = 1000   # 初始化金钱
         self.addr_list = [6, 6, 6, 6, 6]
         self.bet_money = 0
 
-#对手类
-class Opponet():
+
+
+# 对手类
+class Opponent():
+    initial_money = 0
     bet_seq = ""
     bet_money = 0
+    pot_money = 3
+
+
+# 属性集
+class Property:
+    hold_card_level = 0
+    bet_sequence = ""
+    stack_commit = 0
+    board_texture = 0
+    action = ()
+    outcome = ()
+
+    @classmethod
+    def printProperty(cls):
+        print("hold_card_level:", cls.hold_card_level)
+        print("bet_sequence:", cls.bet_sequence)
+        print("stack_commit:", cls.stack_commit)
+        print("board_texture", cls.board_texture)

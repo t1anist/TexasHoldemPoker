@@ -63,6 +63,8 @@ level = {1: [r"14,[1-4],14,[1-4]"],
          }
 
 def get_hole_card_level(hand_card0, hand_card1):
+    if hand_card0[0] > hand_card1[0]:
+        hand_card0, hand_card1 = hand_card1, hand_card0
     string = "%d,%d,%d,%d" % (hand_card0[0], hand_card0[1], hand_card1[0], hand_card1[1])
     for x in level.keys():
         for y in level[x]:

@@ -65,6 +65,8 @@ def check_events(tcp_socket):
             Player.raise_money -= 1
             Player.raise_money = max(Player.raise_money,0)
             msg_bet_money.update_msg(Player.raise_money)
+
+
 def kill_buttons():
     Player.tempID = 0
     pass_button.kill()
@@ -72,6 +74,7 @@ def kill_buttons():
     Raise_button.kill()
     bet_money_raise.kill()
     bet_money_down.kill()
+
 
 def action_pass(tcp_socket):
     kill_buttons()
@@ -85,6 +88,7 @@ def action_call(tcp_socket):
     else:
         tcp_socket.send("弃牌".encode('gbk'))
 
+
 def action_raise(tcp_socket):
     kill_buttons()
     if player[Player.ID].money >= Player.raise_money:
@@ -93,6 +97,8 @@ def action_raise(tcp_socket):
         tcp_socket.send(("跟注，" + str(Player.call_money)).encode('gbk'))
     else:
         tcp_socket.send("弃牌".encode('gbk'))
+
+
 # 刷新屏幕
 def update_screen(screen, cards, buttons, msgs):
     screen.fill((230, 230, 230))  # 填充背景

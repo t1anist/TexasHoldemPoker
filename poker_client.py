@@ -4,7 +4,8 @@ import re
 import random
 import time
 from hole_cards_level import *
-from action import abs_act
+import action
+from math import ceil
 clock_s = 0
 clock_flag = 0
 #牌组 （value,color)
@@ -165,8 +166,14 @@ def get_p_win(hand1, hand2, public_card1=0, public_card2=0, public_card3=0, publ
     msgs.add(msg_p_win)
     return Player.p_win
 
-# TODO : finish Action_AI
+
+# TODO : finish board texture
 def action_AI(p_win):
+    Property.hold_card_level = Player.hole_card_level
+    Property.bet_sequence = Opponent.bet_seq
+    Property.stack_commit = ceil(Opponent.bet_money / (Opponent.initial_money / 4) )
+    Property.board_texture = 0
+    Property.printProperty()
     time.sleep(2)
     hand_card = player[0].hand_card
     if p_win<20:  # 胜率低于20 就直接弃牌
@@ -198,6 +205,8 @@ def game_Init():
     for i in range(0, 8):
         msg_action[i + 1].kill()  # 清除选手上局的动作
     Player.pot_money = 0  # 底池清零
+    Opponent.bet_seq = ''
+    Opponent.bet_money = 0
     show_cards(player)  # 显示纸牌
     pos = play_pos_Dict[Player.num]  # 根据玩家人数确定每个玩家的位置
     for i in pos:
@@ -244,6 +253,7 @@ def game_ready(data):
         temp = re.findall(r"\$([0-9|\-]*)", ret[1])  # 筹码
         for i in range(Player.num):
             player[i + 1].money = int(temp[i])
+        Opponent.initial_money = player[2].money
         pos = play_pos_Dict[Player.num]
         for i in pos:
             create_card(player[0], 0, i, 2)
@@ -253,14 +263,17 @@ def game_ready(data):
             update_msg_money(i, 0)
         show_player_name()
 
+
 # tcp客户端程序
 # 接收到的信息分为公有信息和私有信息，公有信息所有玩家都可以看到，私有信息仅自己可见
 def recv_msg(tcp_socket):
     global clock_flag,flag
     flag = 0
-    name = input("请输入你的用户名：")
-    password = input("请输入你的密码：")
-    s = '用户名：' + str(name) + "密码：" + str(password)
+    # name = input("请输入你的用户名：")
+    # password = input("请输入你的密码：")
+    # TODO : ban the login
+    # s = '用户名：' + str(name) + "密码：" + str(password)
+    s = '用户名：AI1密码：123'
     tcp_socket.send(s.encode('gbk'))
     while 1:
         data = tcp_socket.recv(1024)
@@ -272,9 +285,9 @@ def recv_msg(tcp_socket):
             return
         if flag == 0:  # 登录注册
             login(data, tcp_socket)
-        while flag == 1: # 进入游戏等待
+        while flag == 1:  # 进入游戏等待
             pass
-        if flag >= 2: # 游戏中
+        if flag >= 2:  # 游戏中
             game_ready(data)
             ret = re.match(r".*开始游戏.*", data)
             if ret:
@@ -301,15 +314,14 @@ def recv_msg(tcp_socket):
                 update_msg_money(int(ret[1]), int(ret[2]))
                 update_msg_money(int(ret[3]), int(ret[4]))
                 if int(ret[1]) != Player.ID:
-                    Opponet.bet_money += int(ret[2])
+                    Opponent.bet_money = int(ret[2])
                 elif int(ret[2]) != Player.ID:
-                    Opponet.bet_money += int(ret[4])
+                    Opponent.bet_money = int(ret[4])
                 player[int(ret[1])].bet_money = int(ret[2])
                 player[int(ret[3])].bet_money = int(ret[4])
                 Player.raise_money = Player.call_money = int(ret[4])
                 msg_bet_money.update_msg(Player.call_money)
                 msgs.add(msg_bet_money)
-            # TODO : import board texture
             ret = re.match(r".*前三张公共牌为：([0-9]{1,2})[，]([0-9]{1,2})[，]([0-9]{1,2})", data)
             if ret:
                 for i in range(1, 9):
@@ -319,6 +331,8 @@ def recv_msg(tcp_socket):
                 Player.public_card[1] = f_t(ret.group(2))
                 Player.public_card[2] = f_t(ret.group(3))
                 get_p_win(Player.hand_card[0], Player.hand_card[1],Player.public_card[0],Player.public_card[1],Player.public_card[2])
+                Opponent.bet_seq += '-'
+                Opponent.pot_money = Player.pot_money
             ret = re.match(r".*第四张公共牌为：([0-9]{1,2})", data)
             if ret:
                 for i in range(1, 8):
@@ -328,6 +342,8 @@ def recv_msg(tcp_socket):
                 Player.public_card[3] = f_t(ret.group(1))
                 get_p_win(Player.hand_card[0], Player.hand_card[1], Player.public_card[0], Player.public_card[1],
                           Player.public_card[2],Player.public_card[3])
+                Opponent.bet_seq += '-'
+                Opponent.pot_money = Player.pot_money
             ret = re.match(r".*第五张公共牌为：([0-9]{1,2})", data)
             if ret:
                 for i in range(1, 8):
@@ -337,20 +353,25 @@ def recv_msg(tcp_socket):
                 Player.public_card[4] = f_t(ret.group(1))
                 get_p_win(Player.hand_card[0], Player.hand_card[1], Player.public_card[0], Player.public_card[1],
                           Player.public_card[2], Player.public_card[3], Player.public_card[4])
+                Opponent.bet_seq += '-'
+                Opponent.pot_money = Player.pot_money
                 flag = 3
             ret = re.match(r".*玩家([1-8])的动作为：(弃牌)", data)
             if ret:
                 update_msg_action(int(ret.group(1)), ret.group(2))
-                if ret[1] != Player.ID:
-                    Opponet.bet_seq += abs_act.FOLD
+                if ret[1] == '2':
+                    Opponent.bet_seq += 'f'
             ret = re.match(r".*玩家([1-8])的动作为：(跟注|加注)，([0-9]*)", data)
             if ret:
                 update_msg_action(int(ret.group(1)), ret.group(2) + ret.group(3))
                 update_msg_money(int(ret.group(1)), int(ret.group(3)) - player[int(ret.group(1))].bet_money)
                 player[int(ret.group(1))].bet_money = int(ret.group(3))
-                if ret[1] != Player.ID:
-                    Opponet.bet_seq += abs_act.FOLD
-                    Opponet.bet_money = int(ret.group(3))
+                if ret[1] == '2':
+                    if ret[2] == u"跟注":
+                        Opponent.bet_seq += 'c'
+                    elif ret[2] == u"加注":
+                        Opponent.bet_seq += action.hard_translate(int(ret[3]), Opponent.pot_money)
+                    Opponent.bet_money = int(ret.group(3))
             ret = re.match(r".*玩家([1-8])行动中，([0-9]*)", data)
             if ret:
                 update_msg_action(int(ret.group(1)), " ")
@@ -382,18 +403,24 @@ def recv_msg(tcp_socket):
                 update_msg_money(int(ret.group(1)), -Player.pot_money)
                 show_result(int(ret.group(1)), ret.group(2))
                 clock_msg.kill()
+                Opponent.bet_seq = ''
+                Opponent.pot_money = 3
                 Player.state = 1
                 buttons.add(play_button)
                 up_money()
+                Opponent.initial_money = player[2].money
             ret = re.match(r".*玩家([1-8])和玩家([1-8])平局！(.*)", data)
             if ret:
                 update_msg_money(int(ret.group(1)), -Player.pot_money / 2, 1)
                 update_msg_money(int(ret.group(2)), -Player.pot_money / 2, 1)
                 show_result(int(ret.group(1)), ret.group(3), 1)
                 clock_msg.kill()
+                Opponent.bet_seq = ''
+                Opponent.pot_money = 3
                 Player.state = 1
                 buttons.add(play_button)
                 up_money()
+                Opponent.initial_money = player[2].money
             ret = re.match(r".*玩家([1-8])玩家([1-8])玩家([1-8])平局！(.*)", data)
             if ret:
                 update_msg_money(int(ret.group(1)), -Player.pot_money / 3, 1)
@@ -401,9 +428,12 @@ def recv_msg(tcp_socket):
                 update_msg_money(int(ret.group(3)), -Player.pot_money / 3, 1)
                 show_result(int(ret.group(1)), ret.group(4), 1)
                 clock_msg.kill()
+                Opponent.bet_seq = ''
+                Opponent.pot_money = 3
                 Player.state = 1
                 buttons.add(play_button)
                 up_money()
+                Opponent.initial_money = player[2].money
             if play_button in buttons:
                 ret = re.match(r"AI", player[Player.ID].name)
                 if ret:
