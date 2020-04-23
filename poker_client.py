@@ -6,6 +6,7 @@ import time
 from hole_cards_level import *
 import action
 from math import ceil
+import boardTexture
 clock_s = 0
 clock_flag = 0
 #牌组 （value,color)
@@ -167,12 +168,12 @@ def get_p_win(hand1, hand2, public_card1=0, public_card2=0, public_card3=0, publ
     return Player.p_win
 
 
-# TODO : finish board texture
+# TODO : test board texture
 def action_AI(p_win):
     Property.hold_card_level = Player.hole_card_level
     Property.bet_sequence = Opponent.bet_seq
-    Property.stack_commit = ceil(Opponent.bet_money / (Opponent.initial_money / 4) )
-    Property.board_texture = 0
+    Property.stack_commit = ceil((Opponent.initial_money - player[2].money) / (Opponent.initial_money / 4))
+    Property.board_texture = boardTexture.getBoardTexture()
     Property.printProperty()
     time.sleep(2)
     hand_card = player[0].hand_card
@@ -273,7 +274,7 @@ def recv_msg(tcp_socket):
     # password = input("请输入你的密码：")
     # TODO : ban the login
     # s = '用户名：' + str(name) + "密码：" + str(password)
-    s = '用户名：AI1密码：123'
+    s = '用户名：AI密码：123'
     tcp_socket.send(s.encode('gbk'))
     while 1:
         data = tcp_socket.recv(1024)
