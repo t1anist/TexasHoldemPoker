@@ -408,3 +408,5 @@ buttons = Group()  # 创建一个按键的编组
 msgs = Group()  # 创建一个信息的编组
 button_init()
 create_msgs()
+
+db = ''

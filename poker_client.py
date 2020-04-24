@@ -7,6 +7,7 @@ from hole_cards_level import *
 import action
 from math import ceil
 import boardTexture
+import pymysql
 clock_s = 0
 clock_flag = 0
 #牌组 （value,color)
@@ -36,7 +37,7 @@ def get_card_power(num1, num2, num3, num4, num5, color1, color2, color3, color4,
     cards_list.sort()
     result = 0
     straight = 1
-    for i in range(4):   #  顺子
+    for i in range(4):   # 顺子
         if cards_list[i] + 1 != cards_list[i + 1]:
             straight = 0
             break
@@ -168,13 +169,16 @@ def get_p_win(hand1, hand2, public_card1=0, public_card2=0, public_card3=0, publ
     return Player.p_win
 
 
-# TODO : test board texture
+# TODO : modify the bet_sequence
 def action_AI(p_win):
+    global db
     Property.hold_card_level = Player.hole_card_level
     Property.bet_sequence = Opponent.bet_seq
     Property.stack_commit = ceil((Opponent.initial_money - player[2].money) / (Opponent.initial_money / 4))
     Property.board_texture = boardTexture.getBoardTexture()
     Property.printProperty()
+    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='woshi250ma?', db='test', charset='utf8')
+    cursor = db.cursor()
     time.sleep(2)
     hand_card = player[0].hand_card
     if p_win<20:  # 胜率低于20 就直接弃牌
@@ -410,6 +414,7 @@ def recv_msg(tcp_socket):
                 buttons.add(play_button)
                 up_money()
                 Opponent.initial_money = player[2].money
+                Player.public_card = [2, 3, 4, 5, 6]
             ret = re.match(r".*玩家([1-8])和玩家([1-8])平局！(.*)", data)
             if ret:
                 update_msg_money(int(ret.group(1)), -Player.pot_money / 2, 1)
@@ -422,6 +427,7 @@ def recv_msg(tcp_socket):
                 buttons.add(play_button)
                 up_money()
                 Opponent.initial_money = player[2].money
+                Player.public_card = [2, 3, 4, 5, 6]
             ret = re.match(r".*玩家([1-8])玩家([1-8])玩家([1-8])平局！(.*)", data)
             if ret:
                 update_msg_money(int(ret.group(1)), -Player.pot_money / 3, 1)
@@ -435,6 +441,7 @@ def recv_msg(tcp_socket):
                 buttons.add(play_button)
                 up_money()
                 Opponent.initial_money = player[2].money
+                Player.public_card = [2, 3, 4, 5, 6]
             if play_button in buttons:
                 ret = re.match(r"AI", player[Player.ID].name)
                 if ret:

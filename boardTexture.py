@@ -100,84 +100,15 @@ def find_straight(card_list):
     temp_list = card_list.copy()
     if len(card_list) == 5:
         # 差0张
-        if card_list == [2, 3, 4, 5, 14]:
+        if all_straight(card_list) or card_list == [2, 3, 4, 5, 14]:
             return 0
-        if all_straight(card_list):
-            return 0
-        # 差1张
-        for i in range(4):
-            temp_list[i] = card_list[i+1]-1
-            if all_straight(temp_list):
-                return 1
-            if i <= 2 and temp_list == [2, 3, 4, 5, 14]:
-                return 1
+        # 差1张 / 两张
+        for i in range(5):
             temp_list = card_list.copy()
-        temp_list[4] = card_list[3] + 1
-        if all_straight(temp_list):
-            return 1
-        temp_list = card_list.copy()
-        temp_list[4] = 14
-        if temp_list == [2, 3, 4, 5, 14]:
-            return 1
-        # 差2张
-        temp_list = card_list.copy()
-        # 12号位
-        if temp_list[2:] == [4, 5, 14] or all_straight(temp_list[2:]):
-            return 2
-        # 13号位
-        temp_list = card_list.copy()
-        temp_list[0] = temp_list[1]-1
-        temp_list[2] = temp_list[1]+1
-        if all_straight(temp_list) or temp_list == [2, 3, 4, 5, 14]:
-            return 2
-        # 14号位
-        temp_list = card_list.copy()
-        temp_list[0] = temp_list[1]-1
-        temp_list[3] = temp_list[2]+1
-        if all_straight(temp_list) or temp_list == [2, 3, 4, 5, 14]:
-            return 2
-        # 15号位
-        temp_list = card_list.copy()
-        temp_list[0] = temp_list[1]-1
-        temp_list[4] = temp_list[3]+1
-        if all_straight(temp_list):
-            return 2
-        # 23号位
-        temp_list = card_list.copy()
-        temp_list[1] = temp_list[0]+1
-        temp_list[2] = temp_list[1]+1
-        if all_straight(temp_list) or temp_list == [2, 3, 4, 5, 14]:
-            return 2
-        # 24号位
-        temp_list = card_list.copy()
-        temp_list[1] = temp_list[0]+1
-        temp_list[3] = temp_list[2]+1
-        if all_straight(temp_list) or temp_list == [2, 3, 4, 5, 14]:
-            return 2
-        # 25号位
-        temp_list = card_list.copy()
-        temp_list[1] = temp_list[0]+1
-        temp_list[4] = temp_list[3]+1
-        if all_straight(temp_list):
-            return 2
-        # 34号位
-        temp_list = card_list.copy()
-        temp_list[2] = temp_list[1]+1
-        temp_list[3] = temp_list[2]+1
-        if all_straight(temp_list) or temp_list == [2, 3, 4, 5, 14]:
-            return 2
-        # 35号位
-        temp_list = card_list.copy()
-        temp_list[2] = temp_list[3]-1
-        temp_list[4] = temp_list[3]+1
-        if all_straight(temp_list):
-            return 2
-        # 45号位
-        temp_list = card_list.copy()
-        temp_list[3] = temp_list[2]+1
-        temp_list[4] = temp_list[3]+1
-        if all_straight(temp_list):
-            return 2
+            temp_list.remove(temp_list[i])
+            straight = find_straight(temp_list)
+            if straight < 3:
+                return straight
         return 3
     elif len(card_list) == 4:
         # 差1张
