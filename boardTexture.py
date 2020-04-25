@@ -1,5 +1,7 @@
 from enum import Enum
 from poker_card import Player
+from collections import Counter
+
 
 class boardTexture(Enum):
     No_Salient = 0
@@ -25,27 +27,27 @@ def getBoardTexture():
         suit_list = [Player.public_card[0][1], Player.public_card[1][1], Player.public_card[2][1],
                      Player.public_card[3][1], Player.public_card[4][1]]
         straight = find_straight(card_list)
-        flush = len(set(suit_list))
+        flush = find_flush(card_list)
         if straight > 2:
-            if flush > 3:
+            if flush < 3:
                 return boardTexture.No_Salient
             elif flush == 3:
                 return boardTexture.Flush_Possible
-            elif flush <= 2:
+            elif flush > 3:
                 return boardTexture.Flush_High_Possible
         elif straight == 2:
-            if flush > 3:
+            if flush < 3:
                 return boardTexture.Straight_Possible
             elif flush == 3:
                 return boardTexture.Flush_Possible_Straight_Possible
-            elif flush <= 2:
+            elif flush > 3:
                 return boardTexture.Flush_High_Possible_Straight_Possible
         elif straight < 2:
-            if flush > 3:
+            if flush < 3:
                 return boardTexture.Straight_High_Possible
             elif flush == 3:
                 return boardTexture.Flush_Possible_Straight_High_Possible
-            elif flush <= 2:
+            elif flush > 3:
                 return boardTexture.Flush_High_Possible_Straight_High_Possible
     elif isinstance(Player.public_card[3], tuple):
         card_list = [Player.public_card[0][0], Player.public_card[1][0], Player.public_card[2][0],
@@ -56,25 +58,25 @@ def getBoardTexture():
         straight = find_straight(card_list)
         flush = len(set(suit_list))
         if straight > 2:
-            if flush > 2:
+            if flush < 3:
                 return boardTexture.No_Salient
-            elif flush == 2:
+            elif flush == 3:
                 return boardTexture.Flush_Possible
-            elif flush == 2:
+            elif flush > 3:
                 return boardTexture.Flush_High_Possible
         elif straight == 2:
-            if flush > 2:
+            if flush < 3:
                 return boardTexture.Straight_Possible
-            elif flush == 2:
+            elif flush == 3:
                 return boardTexture.Flush_Possible_Straight_Possible
-            elif flush == 1:
+            elif flush > 3:
                 return boardTexture.Flush_High_Possible_Straight_Possible
         elif straight < 2:
-            if flush > 2:
+            if flush < 3:
                 return boardTexture.Straight_High_Possible
-            elif flush == 2:
+            elif flush == 3:
                 return boardTexture.Flush_Possible_Straight_High_Possible
-            elif flush == 1:
+            elif flush > 3:
                 return boardTexture.Flush_High_Possible_Straight_High_Possible
     elif isinstance(Player.public_card[2], tuple):
         card_list = [Player.public_card[0][0], Player.public_card[1][0], Player.public_card[2][0]]
@@ -83,14 +85,14 @@ def getBoardTexture():
         straight = find_straight(card_list)
         flush = len(set(suit_list))
         if straight > 2:
-            if flush > 1:
+            if flush < 3:
                 return boardTexture.No_Salient
-            elif flush == 1:
+            elif flush == 3:
                 return boardTexture.Flush_Possible
         elif straight == 2:
-            if flush > 1:
+            if flush < 3:
                 return boardTexture.Straight_Possible
-            elif flush == 1:
+            elif flush == 3:
                 return boardTexture.Flush_Possible_Straight_Possible
     else:
         return boardTexture.No_Salient
@@ -181,3 +183,12 @@ def all_straight(card_list):
             flag = False
             break
     return flag
+
+
+def find_flush(card_list):
+    c = Counter(card_list)
+    max = 0
+    for i in c.values():
+        if i > max:
+            max = i
+    return i

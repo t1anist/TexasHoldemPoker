@@ -56,7 +56,6 @@ class Player:
         self.bet_money = 0
 
 
-
 # 对手类
 class Opponent():
     initial_money = 0
@@ -67,7 +66,7 @@ class Opponent():
 
 # 属性集
 class Property:
-    hold_card_level = 0
+    hole_card_level = 0
     bet_sequence = ""
     stack_commit = 0
     board_texture = 0

@@ -1,4 +1,5 @@
 import random
+from math import ceil
 
 
 def hard_translate(real_act, pot):
@@ -37,10 +38,8 @@ def hard_translate(real_act, pot):
     elif 5 < b < 10:
         a, c = 5, 10
         abs_a, abs_c = 'v', 't'
-    elif b == 10:
+    elif b >= 10:
         return 't'
-    else:
-        return 'a'
     a *= pot
     c *= pot
     p_a = ((a/real_act)-(a/c)) / (1-(a/c))
@@ -51,3 +50,26 @@ def hard_translate(real_act, pot):
         return abs_a
     else:
         return abs_c
+
+
+def reverse_translate(abs_action, pot):
+    a = 0
+    if abs_action == 'f' or abs_action == 'c' or abs_action == 'a':
+        return abs_action
+    if abs_action == 'q':
+        a = ceil(0.25 * pot)
+    elif abs_action == 'h':
+        a = ceil(0.5 * pot)
+    elif abs_action == 'i':
+        a = ceil(0.75 * pot)
+    elif abs_action == 'p':
+        a = pot
+    elif abs_action == 'd':
+        a = 2 * pot
+    elif abs_action == 'v':
+        a = 5 * pot
+    elif abs_action == 't':
+        a = 10 * pot
+    b = 1 + random.random * 0.3
+    a = ceil(a*b)
+    return a

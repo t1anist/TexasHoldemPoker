@@ -8,6 +8,7 @@ import action
 from math import ceil
 import boardTexture
 import pymysql
+from similarity import cal_similarity
 clock_s = 0
 clock_flag = 0
 #牌组 （value,color)
@@ -170,17 +171,27 @@ def get_p_win(hand1, hand2, public_card1=0, public_card2=0, public_card3=0, publ
 
 
 # TODO : modify the bet_sequence
+# TODO : similarity
 def action_AI(p_win):
     global db
-    Property.hold_card_level = Player.hole_card_level
+    Property.hole_card_level = Player.hole_card_level
     Property.bet_sequence = Opponent.bet_seq
     Property.stack_commit = ceil((Opponent.initial_money - player[2].money) / (Opponent.initial_money / 4))
     Property.board_texture = boardTexture.getBoardTexture()
     Property.printProperty()
-    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='woshi250ma?', db='test', charset='utf8')
+    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='woshi250ma?', db='poker', charset='utf8')
     cursor = db.cursor()
+    sql = "select * from test"
+    cursor.execute(sql)
+    result = cursor.fetchone()
+    similarity = 0
+    sameone = 0
+    while result:
+        print(result)
+        if similarity < cal_similarity(result):
+            sameone = result[0]
+        result = cursor.fetchone()
     time.sleep(2)
-    hand_card = player[0].hand_card
     if p_win<20:  # 胜率低于20 就直接弃牌
         tcp_socket.send("弃牌".encode( 'gbk'))
     elif p_win<40: # 胜率低于40 根据跟注大小进行弃牌或者跟注操作
@@ -219,12 +230,14 @@ def game_Init():
         create_card(player[0], 1, i, 2)
     msgs.add(clock_msg)
 
+
 def up_money():  # 更新每人的筹码数
     if Player.ID == 1:
         s = "每人筹码："
         for i in range(Player.num):
             s += "$" + str(player[i+1].money)
         tcp_socket.send(s.encode('gbk'))
+
 
 def login(data,tcp_socket):
     global flag
@@ -375,7 +388,10 @@ def recv_msg(tcp_socket):
                     if ret[2] == u"跟注":
                         Opponent.bet_seq += 'c'
                     elif ret[2] == u"加注":
-                        Opponent.bet_seq += action.hard_translate(int(ret[3]), Opponent.pot_money)
+                        if player[2].money == 0:
+                            Opponent.bet_seq += 'a'
+                        else:
+                            Opponent.bet_seq += action.hard_translate(int(ret[3]), Opponent.pot_money)
                     Opponent.bet_money = int(ret.group(3))
             ret = re.match(r".*玩家([1-8])行动中，([0-9]*)", data)
             if ret:
@@ -468,6 +484,7 @@ def clock_start():
     timer.start()
     if Player.ID == Player.tempID and clock_s == Player.time and Player.state == 0:  # 规定时间没做出操作则自动弃牌:
         action_pass(tcp_socket)
+
 
 feature = ['ip']
 if __name__ == "__main__":

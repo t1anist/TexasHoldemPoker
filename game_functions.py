@@ -7,6 +7,8 @@ from textbox import Textbox
 from clock import Clock
 from banker import Banker
 from button import Button
+
+
 def check_events(tcp_socket):
     # 响应按键和鼠标
     for event in pygame.event.get():
@@ -234,7 +236,6 @@ def update_msg_money(player_id, money, flag = 0):
     msg_pot_money.rect.centerx = screen_rect.centerx
     msg_pot_money.rect.bottom = screen_rect.centery - card_height/2
     msgs.add(msg_pot_money)
-
     if pos_dict[player_id] == 1:
         msg_money[1].rect.left = center_x1 + 5
         msg_money[1].rect.bottom = screen_height
@@ -275,6 +276,7 @@ def update_msg_money(player_id, money, flag = 0):
         msg_money[8].rect.bottom = screen_height
         msg_money[8].update_msg("筹码"+str(player[player_id].money))
         msgs.add(msg_money[8])
+
 
 # 显示玩家名字
 def show_player_name():
@@ -334,7 +336,8 @@ def show_cards(player):
             create_card(player[(i + Player.ID - 1)%(Player.num+1)], 0, pos[i-1], 0)  #显示2张手牌
             create_card(player[(i + Player.ID - 1)%(Player.num+1)], 1, pos[i-1], 0)
 
-#显示游戏结果
+
+# 显示游戏结果
 def show_result(winner_ID, rank, flag = 0):
     if flag == 0:
         game_resulet_msg.update_msg(player[winner_ID].name + "获得胜利!" + rank)
@@ -344,6 +347,7 @@ def show_result(winner_ID, rank, flag = 0):
     game_resulet_msg.rect.centerx = screen_rect.centerx
     game_resulet_msg.rect.bottom = screen_rect.centery - card_height/2
     msgs.add(game_resulet_msg)
+
 
 #  显示玩家num 的手牌
 def update_cards(player, num, card_num1, card_num2, card_num3 = 0):
@@ -358,7 +362,6 @@ def update_cards(player, num, card_num1, card_num2, card_num3 = 0):
         pos = play_pos_Dict[Player.num]
         create_card(player[num], 0, pos[(num + Player.num - Player.ID) % Player.num])
         create_card(player[num], 1, pos[(num + Player.num - Player.ID) % Player.num])
-
 
 
 # 初始化游戏并创建一个屏幕对象
