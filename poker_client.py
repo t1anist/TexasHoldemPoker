@@ -170,43 +170,70 @@ def get_p_win(hand1, hand2, public_card1=0, public_card2=0, public_card3=0, publ
     return Player.p_win
 
 
-# TODO : modify the bet_sequence
-# TODO : similarity
-def action_AI(p_win):
+def action_AI():
     global db
+    time.sleep(2)
     Property.hole_card_level = Player.hole_card_level
     Property.bet_sequence = Opponent.bet_seq
     Property.stack_commit = ceil((Opponent.initial_money - player[2].money) / (Opponent.initial_money / 4))
     Property.board_texture = boardTexture.getBoardTexture()
-    Property.printProperty()
     db = pymysql.connect(host='localhost', port=3306, user='root', passwd='woshi250ma?', db='poker', charset='utf8')
     cursor = db.cursor()
     sql = "select * from test"
     cursor.execute(sql)
     result = cursor.fetchone()
     similarity = 0
-    sameone = 0
+    sameone = tuple()
     while result:
-        print(result)
         if similarity < cal_similarity(result):
-            sameone = result[0]
+            sameone = result
         result = cursor.fetchone()
-    time.sleep(2)
-    if p_win<20:  # 胜率低于20 就直接弃牌
-        tcp_socket.send("弃牌".encode( 'gbk'))
-    elif p_win<40: # 胜率低于40 根据跟注大小进行弃牌或者跟注操作
-        if Player.call_money > p_win*p_win/70:
-            tcp_socket.send("弃牌".encode('gbk'))
-        else:
-            tcp_socket.send(("跟注，" + str(Player.call_money)).encode('gbk'))
-    else:
-        if int(6 * p_win * p_win / 1000) <= Player.call_money:
-            if p_win<60:
-                tcp_socket.send("弃牌".encode('gbk'))
-            else:
-                tcp_socket.send(("跟注，" + str(Player.call_money)).encode('gbk'))
-        else:
-            tcp_socket.send(("加注，" + str(int(6*p_win*p_win/1000))).encode('gbk'))
+    action = str(sameone[5]).split(',')
+    choice = random.random()
+    sum = 0
+    for i in range(len(action)):
+        sum += int(action[i])
+        if choice <= sum:
+            send(i)
+    # time.sleep(2)
+    # if p_win<20:  # 胜率低于20 就直接弃牌
+    #     tcp_socket.send("弃牌".encode( 'gbk'))
+    # elif p_win<40: # 胜率低于40 根据跟注大小进行弃牌或者跟注操作
+    #     if Player.call_money > p_win*p_win/70:
+    #         tcp_socket.send("弃牌".encode('gbk'))
+    #     else:
+    #         tcp_socket.send(("跟注，" + str(Player.call_money)).encode('gbk'))
+    # else:
+    #     if int(6 * p_win * p_win / 1000) <= Player.call_money:
+    #         if p_win<60:
+    #             tcp_socket.send("弃牌".encode('gbk'))
+    #         else:
+    #             tcp_socket.send(("跟注，" + str(Player.call_money)).encode('gbk'))
+    #     else:
+    #         tcp_socket.send(("加注，" + str(int(6*p_win*p_win/1000))).encode('gbk'))
+
+# TODO : 会发送很多次加注，加注上限未限制
+def send(num):
+    if num == 0:
+        tcp_socket.send("弃牌".encode('gbk'))
+    elif num == 1:
+        tcp_socket.send(("跟注，" + str(Player.call_money)).encode('gbk'))
+    elif num == 2:
+        tcp_socket.send(("加注，" + str(action.reverse_translate('q', Opponent.pot_money))).encode('gbk'))
+    elif num == 3:
+        tcp_socket.send(("加注，" + str(action.reverse_translate('h', Opponent.pot_money))).encode('gbk'))
+    elif num == 4:
+        tcp_socket.send(("加注，" + str(action.reverse_translate('i', Opponent.pot_money))).encode('gbk'))
+    elif num == 5:
+        tcp_socket.send(("加注，" + str(action.reverse_translate('p', Opponent.pot_money))).encode('gbk'))
+    elif num == 6:
+        tcp_socket.send(("加注，" + str(action.reverse_translate('d', Opponent.pot_money))).encode('gbk'))
+    elif num == 7:
+        tcp_socket.send(("加注，" + str(action.reverse_translate('v', Opponent.pot_money))).encode('gbk'))
+    elif num == 8:
+        tcp_socket.send(("加注，" + str(action.reverse_translate('t', Opponent.pot_money))).encode('gbk'))
+    elif num == 9:
+        tcp_socket.send(("加注，" + str(player[1].money)).encode('gbk'))
 
 
 def f_t(num):
@@ -408,7 +435,7 @@ def recv_msg(tcp_socket):
                 if Player.ID == int(ret.group(1)):  # 轮到自己行动了
                     ret = re.match(r"AI", player[Player.ID].name)
                     if ret:
-                        action_AI(Player.p_win)
+                        action_AI()
                     else:
                         buttons.add(pass_button)
                         if Player.call_money == 0:

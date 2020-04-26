@@ -75,7 +75,7 @@ class Property:
 
     @classmethod
     def printProperty(cls):
-        print("hold_card_level:", cls.hold_card_level)
+        print("hold_card_level:", cls.hole_card_level)
         print("bet_sequence:", cls.bet_sequence)
         print("stack_commit:", cls.stack_commit)
         print("board_texture", cls.board_texture)

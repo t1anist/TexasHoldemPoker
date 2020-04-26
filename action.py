@@ -70,6 +70,6 @@ def reverse_translate(abs_action, pot):
         a = 5 * pot
     elif abs_action == 't':
         a = 10 * pot
-    b = 1 + random.random * 0.3
+    b = 1 + random.random() * 0.3
     a = ceil(a*b)
     return a
