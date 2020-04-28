@@ -56,7 +56,7 @@ def getBoardTexture():
         suit_list = [Player.public_card[0][1], Player.public_card[1][1], Player.public_card[2][1],
                      Player.public_card[3][1]]
         straight = find_straight(card_list)
-        flush = len(set(suit_list))
+        flush = find_flush(card_list)
         if straight > 2:
             if flush < 3:
                 return boardTexture.No_Salient
@@ -83,7 +83,7 @@ def getBoardTexture():
         card_list.sort()
         suit_list = [Player.public_card[0][1], Player.public_card[1][1], Player.public_card[2][1]]
         straight = find_straight(card_list)
-        flush = len(set(suit_list))
+        flush = find_flush(card_list)
         if straight > 2:
             if flush < 3:
                 return boardTexture.No_Salient
@@ -191,4 +191,4 @@ def find_flush(card_list):
     for i in c.values():
         if i > max:
             max = i
-    return i
+    return max

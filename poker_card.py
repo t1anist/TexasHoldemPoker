@@ -57,7 +57,7 @@ class Player:
 
 
 # 对手类
-class Opponent():
+class Opponent:
     initial_money = 0
     bet_seq = ""
     bet_money = 0

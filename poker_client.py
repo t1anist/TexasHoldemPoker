@@ -195,6 +195,7 @@ def action_AI():
         sum += int(action[i])
         if choice <= sum:
             send(i)
+            break
     # time.sleep(2)
     # if p_win<20:  # 胜率低于20 就直接弃牌
     #     tcp_socket.send("弃牌".encode( 'gbk'))
@@ -212,26 +213,26 @@ def action_AI():
     #     else:
     #         tcp_socket.send(("加注，" + str(int(6*p_win*p_win/1000))).encode('gbk'))
 
-# TODO : 会发送很多次加注，加注上限未限制
+
 def send(num):
     if num == 0:
         tcp_socket.send("弃牌".encode('gbk'))
     elif num == 1:
-        tcp_socket.send(("跟注，" + str(Player.call_money)).encode('gbk'))
+        tcp_socket.send(("跟注，" + str(max(player[1].money, Player.call_money))).encode('gbk'))
     elif num == 2:
-        tcp_socket.send(("加注，" + str(action.reverse_translate('q', Opponent.pot_money))).encode('gbk'))
+        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('q', Opponent.pot_money)))).encode('gbk'))
     elif num == 3:
-        tcp_socket.send(("加注，" + str(action.reverse_translate('h', Opponent.pot_money))).encode('gbk'))
+        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('h', Opponent.pot_money)))).encode('gbk'))
     elif num == 4:
-        tcp_socket.send(("加注，" + str(action.reverse_translate('i', Opponent.pot_money))).encode('gbk'))
+        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('i', Opponent.pot_money)))).encode('gbk'))
     elif num == 5:
-        tcp_socket.send(("加注，" + str(action.reverse_translate('p', Opponent.pot_money))).encode('gbk'))
+        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('p', Opponent.pot_money)))).encode('gbk'))
     elif num == 6:
-        tcp_socket.send(("加注，" + str(action.reverse_translate('d', Opponent.pot_money))).encode('gbk'))
+        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('d', Opponent.pot_money)))).encode('gbk'))
     elif num == 7:
-        tcp_socket.send(("加注，" + str(action.reverse_translate('v', Opponent.pot_money))).encode('gbk'))
+        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('v', Opponent.pot_money)))).encode('gbk'))
     elif num == 8:
-        tcp_socket.send(("加注，" + str(action.reverse_translate('t', Opponent.pot_money))).encode('gbk'))
+        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('t', Opponent.pot_money)))).encode('gbk'))
     elif num == 9:
         tcp_socket.send(("加注，" + str(player[1].money)).encode('gbk'))
 

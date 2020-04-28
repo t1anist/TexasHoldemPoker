@@ -8,7 +8,7 @@ def hard_translate(real_act, pot):
     c = 0
     abs_a = ''
     abs_c = ''
-    if b == 0.25:
+    if b <= 0.25:
         return 'q'
     elif 0.25 < b < 0.5:
         a, c = 0.25, 0.5
