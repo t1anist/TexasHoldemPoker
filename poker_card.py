@@ -79,3 +79,5 @@ class Property:
         print("bet_sequence:", cls.bet_sequence)
         print("stack_commit:", cls.stack_commit)
         print("board_texture", cls.board_texture)
+
+

@@ -137,8 +137,11 @@ def rank(hand_card, public_card):
 def get_p_win(hand1, hand2, public_card1=0, public_card2=0, public_card3=0, public_card4=0, public_card5=0):
     cnt = 0
     temp = deck.copy()
-    temp.remove(hand1)
-    temp.remove(hand2)
+    try:
+        temp.remove(hand1)
+        temp.remove(hand2)
+    except ValueError:
+        pass
     hand = [hand1, hand2]
     if public_card3 != 0 and public_card4 == 0:
         temp.remove(public_card1)
@@ -179,21 +182,26 @@ def action_AI():
     Property.board_texture = boardTexture.getBoardTexture()
     db = pymysql.connect(host='localhost', port=3306, user='root', passwd='woshi250ma?', db='poker', charset='utf8')
     cursor = db.cursor()
-    sql = "select * from test"
+    sql = "select * from result"
     cursor.execute(sql)
-    result = cursor.fetchone()
+    results = cursor.fetchall()
     similarity = 0
     sameone = tuple()
-    while result:
-        if similarity < cal_similarity(result):
+    for result in results:
+        temp_simi = cal_similarity(result)
+        if similarity < temp_simi:
+            similarity = temp_simi
             sameone = result
-        result = cursor.fetchone()
+    # print(sameone)
     action = str(sameone[5]).split(',')
     choice = random.random()
-    sum = 0
+    sum = 0.0
     for i in range(len(action)):
-        sum += int(action[i])
+        temp_str = "%.9f" % (float(action[i]))
+        sum += float(temp_str)
+        # print("Choice is" + str(choice) + ' temp_str is ' + temp_str + 'sum is ' + str(sum))
         if choice <= sum:
+            # print(i)
             send(i)
             break
     # time.sleep(2)
@@ -218,21 +226,45 @@ def send(num):
     if num == 0:
         tcp_socket.send("弃牌".encode('gbk'))
     elif num == 1:
-        tcp_socket.send(("跟注，" + str(max(player[1].money, Player.call_money))).encode('gbk'))
+        call = Player.call_money
+        if player[1].money < Player.call_money:
+            call = player[1].money
+        tcp_socket.send(("跟注，" + str(call)).encode('gbk'))
     elif num == 2:
-        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('q', Opponent.pot_money)))).encode('gbk'))
+        call = action.reverse_translate('q', Opponent.pot_money) + Player.call_money
+        if player[1].money < call:
+            call = player[1].money
+        tcp_socket.send(("加注，" + str(call)).encode('gbk'))
     elif num == 3:
-        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('h', Opponent.pot_money)))).encode('gbk'))
+        call = action.reverse_translate('h', Opponent.pot_money) + Player.call_money
+        if player[1].money < call:
+            call = player[1].money
+        tcp_socket.send(("加注，" + str(call)).encode('gbk'))
     elif num == 4:
-        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('i', Opponent.pot_money)))).encode('gbk'))
+        call = action.reverse_translate('i', Opponent.pot_money) + Player.call_money
+        if player[1].money < call:
+            call = player[1].money
+        tcp_socket.send(("加注，" + str(call)).encode('gbk'))
     elif num == 5:
-        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('p', Opponent.pot_money)))).encode('gbk'))
+        call = action.reverse_translate('p', Opponent.pot_money) + Player.call_money
+        if player[1].money < call:
+            call = player[1].money
+        tcp_socket.send(("加注，" + str(call)).encode('gbk'))
     elif num == 6:
-        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('d', Opponent.pot_money)))).encode('gbk'))
+        call = action.reverse_translate('d', Opponent.pot_money) + Player.call_money
+        if player[1].money < call:
+            call = player[1].money
+        tcp_socket.send(("加注，" + str(call)).encode('gbk'))
     elif num == 7:
-        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('v', Opponent.pot_money)))).encode('gbk'))
+        call = action.reverse_translate('v', Opponent.pot_money) + Player.call_money
+        if player[1].money < call:
+            call = player[1].money
+        tcp_socket.send(("加注，" + str(call)).encode('gbk'))
     elif num == 8:
-        tcp_socket.send(("加注，" + str(max(player[1].money, action.reverse_translate('t', Opponent.pot_money)))).encode('gbk'))
+        call = action.reverse_translate('t', Opponent.pot_money) + Player.call_money
+        if player[1].money < call:
+            call = player[1].money
+        tcp_socket.send(("加注，" + str(call)).encode('gbk'))
     elif num == 9:
         tcp_socket.send(("加注，" + str(player[1].money)).encode('gbk'))
 
@@ -419,7 +451,7 @@ def recv_msg(tcp_socket):
                         if player[2].money == 0:
                             Opponent.bet_seq += 'a'
                         else:
-                            Opponent.bet_seq += action.hard_translate(int(ret[3]), Opponent.pot_money)
+                            Opponent.bet_seq += action.soft_translate(int(ret[3]), Opponent.pot_money)
                     Opponent.bet_money = int(ret.group(3))
             ret = re.match(r".*玩家([1-8])行动中，([0-9]*)", data)
             if ret:

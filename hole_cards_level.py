@@ -62,6 +62,7 @@ level = {1: [r"14,[1-4],14,[1-4]"],
          45: [r"2,[1-4],14,[1-4]", r"3,([1-4]),8,\1", r"4,([1-4]),9,\1", r"2,([1-4]),7,\1", r"2,([1-4]),3,\1"]
          }
 
+
 def get_hole_card_level(hand_card0, hand_card1):
     if hand_card0[0] > hand_card1[0]:
         hand_card0, hand_card1 = hand_card1, hand_card0

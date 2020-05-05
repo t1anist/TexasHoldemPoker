@@ -2,7 +2,7 @@ import random
 from math import ceil
 
 
-def hard_translate(real_act, pot):
+def soft_translate(real_act, pot):
     b = real_act / pot
     a = 0
     c = 0

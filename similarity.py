@@ -34,7 +34,7 @@ def cal_similarity(result):
         c = a[::]
         d = b[::]
         for i in range(len(c)):
-            if c[i] == 'a' or c[i] == 'c':
+            if c[i] == 'a' or c[i] == 'c' or d[i] == 'a' or d[i] == 'c':
                 if d[i] != c[i]:
                     flag = 0
                     break
@@ -43,11 +43,19 @@ def cal_similarity(result):
                     a.remove(c[i])
         if flag:
             sum = 0
-            for i in range(len(a)):
-                sum += abs(bet_distance[a[i]] - bet_distance[b[i]])
-            s3 = 1 - 0.05 * sum
+            if len(a) == 0 and len(b) == 0:
+                s3 = 1
+            else:
+                for i in range(len(a)):
+                    try:
+                        sum += abs(bet_distance[a[i]] - bet_distance[b[i]])
+                    except KeyError:
+                        print(a)
+                        print(b)
+                s3 = 1 - 0.05 * sum
+    else:
+        s3 = 0
     # board_texture
     s4 = board_matrix[Property.board_texture.value][result[4]]
     # total
     return (s1+s2+s3+s4) / 4
-
