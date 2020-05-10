@@ -28,10 +28,6 @@ if __name__ == '__main__':
                 find = 1
                 it.action[result[6]] += 1
                 it.outcome[result[6]] += int(result[7])
-                # if it.outcome[result[6]] == 0:
-                #     print("Exist")
-                #     print(it.action)
-                #     print(result)
                 break
         if not find:
             temp = item(result[2], result[3], result[4], result[5])

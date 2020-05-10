@@ -47,15 +47,10 @@ def cal_similarity(result):
                 s3 = 1
             else:
                 for i in range(len(a)):
-                    try:
-                        sum += abs(bet_distance[a[i]] - bet_distance[b[i]])
-                    except KeyError:
-                        print(a)
-                        print(b)
+                    sum += abs(bet_distance[a[i]] - bet_distance[b[i]])
                 s3 = 1 - 0.05 * sum
     else:
         s3 = 0
     # board_texture
     s4 = board_matrix[Property.board_texture.value][result[4]]
-    # total
     return (s1+s2+s3+s4) / 4

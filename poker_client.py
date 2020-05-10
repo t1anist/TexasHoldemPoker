@@ -192,16 +192,13 @@ def action_AI():
         if similarity < temp_simi:
             similarity = temp_simi
             sameone = result
-    # print(sameone)
     action = str(sameone[5]).split(',')
     choice = random.random()
     sum = 0.0
     for i in range(len(action)):
         temp_str = "%.9f" % (float(action[i]))
         sum += float(temp_str)
-        # print("Choice is" + str(choice) + ' temp_str is ' + temp_str + 'sum is ' + str(sum))
         if choice <= sum:
-            # print(i)
             send(i)
             break
     # time.sleep(2)
